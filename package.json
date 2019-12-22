@@ -1,0 +1,23 @@
+{
+  "name": "ball-balancer",
+  "version": "0.1.0",
+  "description": "A backend for processing video data to track an object and send corresponding commands to the movement hardware",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chaphasilor/ball-balancer.git"
+  },
+  "keywords": [
+    "video-processing",
+    "object-tracking"
+  ],
+  "author": "Chaphasilor",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Chaphasilor/ball-balancer/issues"
+  },
+  "homepage": "https://github.com/Chaphasilor/ball-balancer#readme"
+}
