@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/Chaphasilor/ball-balancer/issues"
   },
-  "homepage": "https://github.com/Chaphasilor/ball-balancer#readme"
+  "homepage": "https://github.com/Chaphasilor/ball-balancer#readme",
+  "dependencies": {
+    "opencv4nodejs": "^5.5.0"
+  }
 }
