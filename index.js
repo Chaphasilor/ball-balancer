@@ -40,10 +40,10 @@ const makeHandMask = (oldFrame) => {
   const contours = blurred.findContours(cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
   // console.log('contours:', contours);
   if (contours.length > 0) {
-    // let largestContour = contours.reduce((largest, current) => {
-    //   return largest.area < current.area ? current : largest;
-    // }, 0)
-    let largestContour = contours[0];
+    let largestContour = contours.reduce((largest, current) => {
+      return largest.area < current.area ? current : largest;
+    }, {area: 0})
+    // let largestContour = contours[0];
     let boundingRect = largestContour.boundingRect();
     // console.log('largestContour:', largestContour);
     // console.log('largestContour.boundingRect():', largestContour.boundingRect());
