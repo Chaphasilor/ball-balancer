@@ -21,6 +21,11 @@
   },
   "homepage": "https://github.com/Chaphasilor/ball-balancer#readme",
   "dependencies": {
-    "opencv4nodejs": "^5.5.0"
+    "express": "^4.17.1",
+    "http": "0.0.0",
+    "mediaserver": "^0.1.1",
+    "morgan": "^1.9.1",
+    "opencv4nodejs": "^5.5.0",
+    "ws": "^7.2.1"
   }
 }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>WebSocket tester</title>
+</head>
+<body>
+
+  <canvas id='myCanvas'></canvas>
+
+  <script>
+
+    let ws = new WebSocket('ws://localhost:3000/socket');
+    ws.addEventListener('open', function (event) {
+      ws.send('Hello Server!');
+    });
+    ws.addEventListener('message', function (event) {
+      console.log(event.data);
+
+      // create new ImageData from raw mat data
+      const imgData = new ImageData(
+        new Uint8ClampedArray(event.data),
+        event.data.length,
+        event.data[0].length
+      );
+
+      // set canvas dimensions
+      const canvas = document.getElementById('myCanvas');
+      canvas.height = img.rows;
+      canvas.width = img.cols;
+
+      // set image data
+      const ctx = canvas.getContext('2d');
+      ctx.putImageData(imgData, 0, 0);
+      
+    });
+    
+  </script>
+  
+</body>
+</html>
