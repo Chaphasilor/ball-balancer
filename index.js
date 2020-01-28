@@ -1,7 +1,10 @@
 const cv = require('opencv4nodejs');
 const dgram = require('dgram');
+const PID = require('./pid');
 // const app = require('./app');
 // const socket = app.settings.wss;
+
+const resolution = [352, 240];
 
 var udpSocket = dgram.createSocket('udp4');
 udpSocket.connect(8888, '192.168.2.102', () => console.log('UDP connected!'));
@@ -19,6 +22,11 @@ const devicePort = 0;
 const wCap = new cv.VideoCapture(devicePort);
 
 console.log(wCap);
+let firstFrame = wCap.read().resize(resolution[1], resolution[0]);
+
+var target = {x: firstFrame.cols/2, y: firstFrame.rows/2};
+
+var controller = new PID(firstFrame.cols, firstFrame.rows, target.x, target.y, -25, -50);
 
 // segmenting by skin color (has to be adjusted)
 const redUpper = hue => new cv.Vec(hue/2, 1 * 255, 1 * 255);
@@ -29,6 +37,8 @@ const redLower = hue => new cv.Vec(hue/2, 0.8 * 255, 0.4 * 255);
 var counter = 0;
 
 const trackBall = (oldFrame, modifyInput = false, locationFrame = null) => {
+
+  oldFrame.drawCircle(new cv.Point2(target.x, target.y), 2, new cv.Vec3(255, 255, 255), 5);
 
   const img = oldFrame.copy();
   // filter by skin color
@@ -71,9 +81,14 @@ const trackBall = (oldFrame, modifyInput = false, locationFrame = null) => {
       // console.log('largestContour.boundingRect():', largestContour.boundingRect());
       x = boundingRect.x + Math.round(boundingRect.width/2);
       y = boundingRect.y + Math.round(boundingRect.height/2);
+
+      controller.submitBallPosition(x, y);
       // console.log('x: '+ x + ', y: ' +  y);
       
-      let message = Buffer.from('X:'+Math.round(((x/blurred.cols)+1.0)*1000)+',Y:'+Math.round(((y/blurred.rows)+1.0)*1000));
+      let servoPositions = controller.retrieveServoPositions();
+      console.log('servoPositions:', servoPositions);
+      let message = Buffer.from('X:'+servoPositions.servoX+',Y:'+servoPositions.servoY);
+      console.log(`x: ${x}, y: ${y}, setting servos to ${servoPositions.servoX}|${servoPositions.servoY}`);
       // udpSocket.send(message, 0, message.length, 8888, '192.168.2.102', (err, bytes) => {
       // udpSocket.send(message, 0, message.length, 3333, '127.0.0.1', (err, bytes) => {
       udpSocket.send(message, 0, message.length, (err, bytes) => {
@@ -176,13 +191,16 @@ async function track(socket) {
       // loop back to start on end of stream reached
       if (frame.empty) {
         wCap.reset();
-        frame = wCap.read();
+        frame = wCap.readAsync();
       }
+      
+      frame = await frame.resizeAsync(resolution[1], resolution[0]);
 
       // console.log('frame: ', frame);
       let location = new cv.Mat(frame.rows, frame.cols, cv.CV_8UC3, [0, 0, 0]);
       let masked = trackBall(frame, true, location);
       cv.imshow('frame', frame);
+      // console.log(`resolution: ${frame.cols}x${frame.rows}`);
       // cv.imshow('masked', masked);
       // cv.imshow('location', location);
       // cv.imshow('modified', modified);
